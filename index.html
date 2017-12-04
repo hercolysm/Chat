@@ -1,0 +1,90 @@
+<html lang="pt-br">
+<head>
+<title>Chat Local</title>
+
+<!-- scripts -->
+<script src="assets/js/jquery-3.1.1.min.js"></script>
+<script src="assets/js/socket.io.js"></script>
+
+<!-- style -->
+<style type="text/css">
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+	body { font: 13px Helvetica, Arial; }
+	form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+	form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+	form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+	#messages { list-style-type: none; margin: 0; padding: 0; }
+	#messages li { padding: 5px 10px; }
+	#messages li:nth-child(odd) { background: #eee; }
+</style>
+</head>
+<body>
+<br>
+<center>Chat Local com Socket.io</center>
+<div id="conectado" class="hide">
+	<p>Status: Conectado!<br> Número de usuários online: <span id="visitas">0</span></p>
+</div>
+<div id="desconectado" class="hide">
+	<p>Status: Desconectado!</p>
+</div>
+	
+<ul id="messages">
+
+</ul>
+<form action="">
+<input id="m" autocomplete="off"><button>Enviar</button>
+</form>
+
+<script>
+$(function(){
+	var origin = location.origin;
+	var port = '3000';
+
+	var socket = io(origin +':'+ port);
+
+	socket.on('connect', () => {
+		conectado();
+		console.log('Conectado ao socket com sucesso! Id: ' + socket.id);
+	});
+
+	socket.on('connect_error', (erro) => {
+		desconectado();
+		console.log('Falha ao conectar ao socket');
+		console.log(erro);
+	});
+
+	socket.on('error', (erro) => {
+		desconectado();
+		console.log('Erro no socket ocorreu!');
+		console.log(erro);
+	});
+
+	socket.on('visits', function(visitas){
+		document.getElementById('visitas').innerHTML = visitas;
+	});
+
+	socket.on('chat message', function(msg){
+		$('#messages').append($('<li>').text(msg));
+	});
+
+
+	$('form').submit(function(){
+		socket.emit('chat message', $('#m').val());
+		$('#m').val('');
+		return false;
+	});
+
+	/* funções */
+	function conectado() {
+		$('#desconectado').hide();
+		$('#conectado').show();
+	}
+
+	function desconectado() {
+		$('#conectado').hide();
+		$('#desconectado').show();
+	}
+});
+</script>
+</body>
+</html>
