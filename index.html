@@ -22,7 +22,7 @@
 <br>
 <center>Chat Local com Socket.io</center>
 <div id="conectado" class="hide">
-	<p>Status: Conectado!<br> Número de usuários online: <span id="visitas">0</span></p>
+	<p>Status: Conectado!<br> Número de usuários online: <span id="clients">0</span></p>
 </div>
 <div id="desconectado" class="hide">
 	<p>Status: Desconectado!</p>
@@ -37,8 +37,8 @@
 
 <script>
 $(function(){
-	var origin = location.origin;
-	var port = '3000';
+	const origin = location.origin;
+	const port = '3000';
 
 	var socket = io(origin +':'+ port);
 
@@ -59,8 +59,8 @@ $(function(){
 		console.log(erro);
 	});
 
-	socket.on('visits', function(visitas){
-		document.getElementById('visitas').innerHTML = visitas;
+	socket.on('new socket connected', function(clients){
+		document.getElementById('clients').innerHTML = clients;
 	});
 
 	socket.on('chat message', function(msg){

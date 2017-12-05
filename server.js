@@ -4,6 +4,7 @@
 const app = require('http').createServer(index);
 const io = require('socket.io').listen(app);
 const fs = require('fs');
+const port = 3000;
 
 function index(req, res){
 	fs.readFile(__dirname + '/index.html', function(err, data){
@@ -12,32 +13,36 @@ function index(req, res){
 	});
 };
 
-app.listen(3000, function() {
-	console.log("Servidor rodando!");
+app.listen(port, function() {
+	console.log("Server running and listening port " + port);
 });
 
 // Iniciando Socket.IO
-var visitas = 0;
+var clients = 0;
 
 // Evento connection ocorre quando entra um novo usuário.
 io.on('connection', function(socket){
-	console.log('Um usuario conectou!');
-	// Incrementa o total de visitas no site.
-	visitas++;
-	// Envia o total de visitas para o novo usuário.
-	socket.emit('visits', visitas);
-	// Envia o total de visitas para os demais usuários.
-	socket.broadcast.emit('visits', visitas);
-	// Evento disconnect ocorre quando sai um usuário.
+	console.log('Socket id: ' + socket.id + ' connected!');
+	// Incrementa o total de clients no site.
+	clients++;
+	// Envia o total de clients para o novo usuário.
+	socket.emit('new socket connected', clients);
+	// Envia o total de clients para os demais usuários.
+	socket.broadcast.emit('new socket connected', clients);
+
+	/* eventos do socket */
+
+	// Evento disconnect ocorre quando sai um client.
 	socket.on('disconnect', function(){
-		console.log('Um usuario desconectou!');
-		visitas--;
-		// Atualiza o total de visitas para os demais usuários.
-		socket.broadcast.emit('visits', visitas);
+		console.log('Socket id: ' + socket.id + ' disconnected!');
+		clients--;
+		// Atualiza o total de clients para os demais usuários.
+		socket.broadcast.emit('new socket connected', clients);
 	});
-	//
+
+	// Evento do chat
 	socket.on('chat message', function(msg){
-		console.log('Nova messagem recebida: ' + msg);
+		console.log('Socket id: ' + socket.id + ' Digitou:' + msg);
 		io.emit('chat message', msg);
 	});
 });
