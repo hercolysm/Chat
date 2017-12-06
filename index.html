@@ -27,10 +27,8 @@
 <div id="desconectado" class="hide">
 	<p>Status: Desconectado!</p>
 </div>
-	
-<ul id="messages">
-
-</ul>
+<ul id="messages"></ul>
+<div id="client_typing"></div>
 <form action="">
 <input id="m" autocomplete="off"><button>Enviar</button>
 </form>
@@ -43,20 +41,20 @@ $(function(){
 	var socket = io(origin +':'+ port);
 
 	socket.on('connect', () => {
-		conectado();
 		console.log('Conectado ao socket com sucesso! Id: ' + socket.id);
+		conectado();
 	});
 
 	socket.on('connect_error', (erro) => {
-		desconectado();
 		console.log('Falha ao conectar ao socket');
 		console.log(erro);
+		desconectado();
 	});
 
 	socket.on('error', (erro) => {
-		desconectado();
 		console.log('Erro no socket ocorreu!');
 		console.log(erro);
+		desconectado();
 	});
 
 	socket.on('new socket connected', function(clients){
@@ -67,11 +65,21 @@ $(function(){
 		$('#messages').append($('<li>').text(msg));
 	});
 
+	socket.on('typing', function(client){
+		console.log(client + 'está digitando...');
+		$('#client_typing').html('<span>'+ client +'</span> esta digitando...');
+		$('#client_typing').fadeIn(500).delay(2000).fadeOut(250);
+	});
+
 
 	$('form').submit(function(){
 		socket.emit('chat message', $('#m').val());
 		$('#m').val('');
 		return false;
+	});
+
+	$('#m').keyup(function(){
+		socket.emit('typing');
 	});
 
 	/* funções */

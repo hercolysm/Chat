@@ -42,7 +42,12 @@ io.on('connection', function(socket){
 
 	// Evento do chat
 	socket.on('chat message', function(msg){
-		console.log('Socket id: ' + socket.id + ' Digitou:' + msg);
+		console.log('Socket id: ' + socket.id + ' say:' + msg);
 		io.emit('chat message', msg);
+	});
+
+	socket.on('typing', function(){
+		console.log('Socket id: ' + socket.id + ' is typing...');
+		io.emit('typing', socket.id);
 	});
 });
