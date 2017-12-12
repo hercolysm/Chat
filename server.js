@@ -6,6 +6,12 @@ const io = require('socket.io').listen(app);
 const fs = require('fs');
 const port = 3000;
 
+global.conn = require('./db');
+
+/* funções */
+
+//global.db = require(__dirname + '/db');
+
 function index(req, res){
 	fs.readFile(__dirname + '/index.html', function(err, data){
 		res.writeHead(200);
@@ -51,3 +57,11 @@ io.on('connection', function(socket){
 		io.emit('typing', socket.id);
 	});
 });
+setTimeout(function(){
+global.conn.findAll((e, docs) => {
+	if (e) { console.log(e); }
+	console.log("Retorno:");
+	console.log(docs);
+});
+}, 10000);
+
