@@ -8,6 +8,8 @@ const port = 3000;
 
 global.conn = require('./db');
 
+var chat = [];
+
 /* funções */
 
 //global.db = require(__dirname + '/db');
@@ -49,19 +51,30 @@ io.on('connection', function(socket){
 	// Evento do chat
 	socket.on('chat message', function(msg){
 		console.log('Socket id: ' + socket.id + ' say:' + msg);
+		var row = [{'agent': socket.id, 'message': msg}];
+		global.conn.insert(row);
 		io.emit('chat message', msg);
 	});
 
-	socket.on('typing', function(){
+	socket.on('chat typing', function(){
 		console.log('Socket id: ' + socket.id + ' is typing...');
 		io.emit('typing', socket.id);
 	});
-});
-setTimeout(function(){
-global.conn.findAll((e, docs) => {
-	if (e) { console.log(e); }
-	console.log("Retorno:");
-	console.log(docs);
-});
-}, 10000);
 
+	//
+	global.conn.findAll((err, docs) => {
+		console.log("Buscando mensagens...");
+		if (err) { console.log(err); }
+		chat = docs;
+		socket.emit('chat', chat);
+	});
+});
+
+/*setTimeout(function(){
+	global.conn.findAll((e, docs) => {
+		if (e) { console.log(e); }
+		console.log("Retorno:");
+		console.log(docs);
+	});
+}, 10000);
+*/

@@ -65,10 +65,17 @@ $(function(){
 		$('#messages').append($('<li>').text(msg));
 	});
 
-	socket.on('typing', function(client){
+	socket.on('chat typing', function(client){
 		console.log(client + 'está digitando...');
 		$('#client_typing').html('<span>'+ client +'</span> esta digitando...');
 		$('#client_typing').fadeIn(500).delay(2000).fadeOut(250);
+	});
+
+	socket.on('chat', function(chat){
+		$('#messages').html('');
+		$.each(chat, function(i, row){
+			$('#messages').append($('<li>').text(row.message));
+		});
 	});
 
 
@@ -79,7 +86,7 @@ $(function(){
 	});
 
 	$('#m').keyup(function(){
-		socket.emit('typing');
+		socket.emit('chat typing');
 	});
 
 	/* funções */
