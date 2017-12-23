@@ -1,2 +1,3 @@
 # ignora dependências
+data/*
 node_modules/

@@ -58,7 +58,7 @@ io.on('connection', function(socket){
 
 	socket.on('chat typing', function(){
 		console.log('Socket id: ' + socket.id + ' is typing...');
-		io.emit('typing', socket.id);
+		io.emit('chat typing', socket.id);
 	});
 
 	//
