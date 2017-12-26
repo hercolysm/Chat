@@ -28,15 +28,33 @@ app.listen(port, function() {
 // Iniciando Socket.IO
 var clients = 0;
 
+// Autenticação do client
+io.use((socket, next) => {
+	var room = socket.handshake.query.channel;
+	if (room!=1 && room!=2) {
+		return next(new Error('Falha na autenticação'));
+	}
+	return next();
+});
+
 // Evento connection ocorre quando entra um novo usuário.
 io.on('connection', function(socket){
 	console.log('Socket id: ' + socket.id + ' connected!');
+	
 	// Incrementa o total de clients no site.
 	clients++;
 	// Envia o total de clients para o novo usuário.
 	socket.emit('new socket connected', clients);
 	// Envia o total de clients para os demais usuários.
 	socket.broadcast.emit('new socket connected', clients);
+	
+	// Define a sala do chat
+	var room = socket.handshake.query.channel;
+	
+	socket.join(room, () => {
+		console.log('Socket id: ' + socket.id + ' joined to room ' + room + '!');
+		io.to(room).emit('new socket joined', room, io.sockets.adapter.rooms[room].length);
+	});
 
 	/* eventos do socket */
 
@@ -45,25 +63,29 @@ io.on('connection', function(socket){
 		console.log('Socket id: ' + socket.id + ' disconnected!');
 		clients--;
 		// Atualiza o total de clients para os demais usuários.
-		socket.broadcast.emit('new socket connected', clients);
+		socket.to(room).broadcast.emit('new socket disconnected', clients);
+		//
+		//console.log(io.sockets.adapter.rooms);
+		var count_room = (io.sockets.adapter.rooms[room] != undefined) ? io.sockets.adapter.rooms[room].length : 0;
+		io.to(room).emit('new socket leaved', count_room);
 	});
 
 	// Evento do chat
 	socket.on('chat message', function(msg){
 		console.log('Socket id: ' + socket.id + ' say:' + msg);
-		var row = [{'agent': socket.id, 'message': msg}];
+		var row = [{'room': room, 'agent': socket.id, 'message': msg}];
 		global.conn.insert(row);
-		io.emit('chat message', msg);
+		io.to(room).emit('chat message', msg);
 	});
 
 	socket.on('chat typing', function(){
 		console.log('Socket id: ' + socket.id + ' is typing...');
-		io.emit('chat typing', socket.id);
+		socket.to(room).broadcast.emit('chat typing', socket.id);
 	});
 
 	//
-	global.conn.findAll((err, docs) => {
-		console.log("Buscando mensagens...");
+	global.conn.findAll(room, (err, docs) => {
+		console.log('Buscando mensagens da sala ' + room + ' ...');
 		if (err) { console.log(err); }
 		chat = docs;
 		socket.emit('chat', chat);

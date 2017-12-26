@@ -17,11 +17,11 @@ module.exports = { findAll, insert };
  *
  * Retorna consulta
  */
-function findAll(callback) {
+function findAll(room, callback) {
 
 	if (conn) {
 		var db = conn.db('chat');
-		db.collection('message').find({}).toArray(callback);
+		db.collection('message').find({room: room}).toArray(callback);
 	}
 
 }

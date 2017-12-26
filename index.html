@@ -22,13 +22,19 @@
 <br>
 <center>Chat Local com Socket.io</center>
 <div id="conectado" class="hide">
-	<p>Status: Conectado!<br> Número de usuários online: <span id="clients">0</span></p>
+	<p>Status: Conectado!</p>
+	<p>Sala: <span id="sala_atual">-</span><br> Usuários Online: <span id="sala_clients">0</span></p>
 </div>
 <div id="desconectado" class="hide">
 	<p>Status: Desconectado!</p>
 </div>
 <ul id="messages"></ul>
 <div id="client_typing"></div>
+<br>
+<br>
+<br>
+<br>
+<br>
 <form action="">
 <input id="m" autocomplete="off"><button>Enviar</button>
 </form>
@@ -37,8 +43,13 @@
 $(function(){
 	const origin = location.origin;
 	const port = '3000';
+	const room = Math.floor( (Math.random() * 2) + 1) ;
 
-	var socket = io(origin +':'+ port);
+	const socket = io(origin +':'+ port, {
+		query: {
+			channel: room
+		}
+	});
 
 	socket.on('connect', () => {
 		console.log('Conectado ao socket com sucesso! Id: ' + socket.id);
@@ -58,10 +69,24 @@ $(function(){
 	});
 
 	socket.on('new socket connected', function(clients){
-		document.getElementById('clients').innerHTML = clients;
+		//document.getElementById('clients').innerHTML = clients;
+	});
+
+	socket.on('new socket disconnected', function(clients){
+		//document.getElementById('clients').innerHTML = clients;
+	});
+
+	socket.on('new socket joined', function(sala, clients){
+		document.getElementById('sala_atual').innerHTML = sala;
+		document.getElementById('sala_clients').innerHTML = clients;
+	});
+
+	socket.on('new socket leaved', function(clients){
+		document.getElementById('sala_clients').innerHTML = clients;
 	});
 
 	socket.on('chat message', function(msg){
+		$('#client_typing').html('');
 		$('#messages').append($('<li>').text(msg));
 	});
 
