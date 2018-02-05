@@ -10,7 +10,7 @@ else
 	YES=/tmp/on
 
 	control_c () {
-		echo -e "\nDeamon finished"
+		echo "\nDeamon finished" >> $LOG
 		rm $YES 2>/dev/null
 		rm $LOCK 2>/dev/null
 		exit 0
@@ -34,6 +34,10 @@ else
 				rm $LOCK 2>/dev/null
 				echo "`date`: Deamon finished." >> $LOG
 				break
+			else
+				echo "`date`: File $YES wasn't found!" >> $LOG
+				echo "`date`: Generate file..." >> $LOG
+				touch $YES
 			fi
 		done
 	else
