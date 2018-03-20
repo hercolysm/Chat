@@ -1,3 +1,5 @@
-# ignora dependências
+# ignora dados do banco mongoBD
 data/*
-node_modules/
+
+# ignora dependências
+node_modules/*

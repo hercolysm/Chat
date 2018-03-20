@@ -6,13 +6,14 @@ const io = require('socket.io').listen(app);
 const fs = require('fs');
 const port = 3000;
 
+// Iniciando redis client
+var redis = require('redis');
+var redis_cli = redis.createClient();
+
+// Iniciando banco mongoDB
 global.conn = require('./db');
 
 var chat = [];
-
-/* funções */
-
-//global.db = require(__dirname + '/db');
 
 function index(req, res){
 	fs.readFile(__dirname + '/index.html', function(err, data){
@@ -58,7 +59,7 @@ io.on('connection', function(socket){
 
 	/* eventos do socket */
 
-	// Evento disconnect ocorre quando sai um client.
+	// Evento disconnect ocorre quando sai um client
 	socket.on('disconnect', function(){
 		console.log('Socket id: ' + socket.id + ' disconnected!');
 		clients--;
@@ -92,11 +93,69 @@ io.on('connection', function(socket){
 	});
 });
 
-/*setTimeout(function(){
-	global.conn.findAll((e, docs) => {
-		if (e) { console.log(e); }
-		console.log("Retorno:");
-		console.log(docs);
-	});
-}, 10000);
+
+// if you'd like to select database 3, instead of 0 (default), call
+// redis_cli.select(3, function() { /* ... */ });
+
+redis_cli.on('connect', () => {
+	console.log("Connected with Redis success!");
+});
+
+redis_cli.on('reconnecting', () => {
+	console.log("Reconnecting with Redis...");
+});
+
+redis_cli.on("error", (err) => {
+    console.log("Failed to connect to Redis: " + err);
+});
+
+redis_cli.on('ready', () => {
+	console.log("Redis Client is ready!");
+});
+
+redis_cli.on('end', () => {
+	console.log("Connection with Redis closed!");
+});
+
+redis_cli.set("string_key", "string val");
+
+redis_cli.get('string_key', (err, reply) => {
+	if (reply) {
+		console.log(reply.toString());
+	}
+});
+
+var sub = redis.createClient(), pub = redis.createClient();
+
+sub.on("subscribe", function (channel, count) {
+    pub.publish("a nice channel", "I am sending a message.");
+    pub.publish("a nice channel", "I am sending a second message.");
+    pub.publish("a nice channel", "I am sending my last message.");
+});
+
+sub.on("message", function (channel, message) {
+    console.log("sub channel " + channel + ": " + message);
+});
+
+sub.subscribe("a nice channel");
+
+redis_cli.quit(); // encerra de forma limpa
+redis_cli.end(true); // encerra violentamente
+/*
+redis_cli.hset("hash_key", "hashtest_1", "some value", redis.print);
+redis_cli.hset(["hash_key", "hashtest_2", "some other value"], redis.print);
+redis_cli.hkeys("hash_key", function (err, replies) {
+    console.log(replies.length + " replies:");
+    replies.forEach(function (reply, i) {
+        console.log("    " + i + ": " + reply);
+    });
+    redis_cli.quit();
+});
+
+/*
+redis_cli.on('message', function(channel, message){
+	console.log('message');
+	console.log(channel);
+	console.log(count);
+});
 */

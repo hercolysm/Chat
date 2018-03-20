@@ -22,6 +22,22 @@ else
 	then
 		echo "################################################" >> $LOG
 		echo "`date`: Daemon running... " >> $LOG
+		
+		echo "`date`: Running mongod... " >> $LOG
+		mongod --dbpath /var/www/html/chat/data/ &
+		
+		echo "`date`: Running mongo... " >> $LOG
+		mongo &
+		
+		echo "`date`: Running server..." >> $LOG
+		node /var/www/html/chat/scripts/server.js &
+
+		echo "`date`: Running redis-server..." >> $LOG
+		redis-server &
+
+		#echo "`date`: Running redis-cli..." >> $LOG
+		#redis-cli &
+		
 		touch $LOCK
 
 		while true

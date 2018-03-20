@@ -16,9 +16,15 @@
 	#messages { list-style-type: none; margin: 0; padding: 0; }
 	#messages li { padding: 5px 10px; }
 	#messages li:nth-child(odd) { background: #eee; }
+	#div_notificacoes { position: fixed; top: 5px; right: 50px; }
 </style>
 </head>
 <body>
+<div id="div_notificacoes">
+	<ul id="notificacoes">
+		<li>Notificação 01</li>
+	</ul>
+</div>
 <br>
 <center>Chat Local com Socket.io</center>
 <div id="conectado" class="hide">
@@ -101,6 +107,13 @@ $(function(){
 		$.each(chat, function(i, row){
 			$('#messages').append($('<li>').text(row.message));
 		});
+	});
+
+	socket.on('notification', function(notifications){
+		$.each(notifications, function(i, row){
+			console.log(i);
+			console.log(row);
+		})
 	});
 
 
