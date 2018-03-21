@@ -57,6 +57,8 @@ io.on('connection', function(socket){
 		io.to(room).emit('new socket joined', room, io.sockets.adapter.rooms[room].length);
 	});
 
+	redis_cli.subscribe(room);
+
 	/* eventos do socket */
 
 	// Evento disconnect ocorre quando sai um client
@@ -125,6 +127,18 @@ redis_cli.get('string_key', (err, reply) => {
 	}
 });
 
+// redis_cli.subscribe('notificacoes');
+
+redis_cli.on('subscribe', (channel, count) => {
+	console.log('listening channel "'+ channel + '('+ count +')' +'"...');
+});
+
+redis_cli.on('message', function(channel, message){
+	console.log('new message received! sending to clients');
+	io.to(channel).emit('notificacoes', message);
+});
+
+/*
 var sub = redis.createClient(), pub = redis.createClient();
 
 sub.on("subscribe", function (channel, count) {
@@ -153,9 +167,5 @@ redis_cli.hkeys("hash_key", function (err, replies) {
 });
 
 /*
-redis_cli.on('message', function(channel, message){
-	console.log('message');
-	console.log(channel);
-	console.log(count);
-});
+
 */
