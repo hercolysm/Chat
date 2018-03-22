@@ -60,12 +60,21 @@ function buscar_notificacoes(){
 	global $PDO;
 	e("Buscando por notificações..");
 	//$total_usuarios = $PDO->query("SELECT COUNT(id_usuario) FROM usuarios")->fetchColumn();
-	$total_mensagens = $PDO->query("SELECT id_sala, COUNT(id_mensagem) as total FROM mensagens GROUP BY id_sala");
-	$salas = array();
+	//$total_mensagens = $PDO->query("SELECT id_sala, COUNT(id_mensagem) as total FROM mensagens GROUP BY id_sala");
+
+/*	$salas = array();
 	while ($row = $total_mensagens->fetch(PDO::FETCH_ASSOC)) {
 		$id_sala = $row["id_sala"];
 		$total_mensagens = $row["total"];
 		array_push($salas, array("id_sala"=>$id_sala, "total"=>$total));
 	}
-	return $salas;
+	return $salas;*/
+	$usuarios_logados = array();
+	$consulta_usuarios_logados = $PDO->query("SELECT id_sala, COUNT(id_usuario) as total FROM usuarios_online GROUP BY id_sala");
+	while ($row = $consulta_usuarios_logados->fetch(PDO::FETCH_ASSOC)) {
+		$id_sala = $row["id_sala"];
+		$total = $row["total"];
+		$usuarios_logados[$id_sala] = $total;
+	}
+	return $usuarios_logados;
 }

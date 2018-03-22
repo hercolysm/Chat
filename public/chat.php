@@ -31,11 +31,11 @@ if (!$_SESSION["id_usuario"] || !$_SESSION["login"] || !$_SESSION["senha"]) {
 <body>
 <div id="div_notificacoes">
 	<ul id="notificacoes">
-		<li>Notificação 01</li>
+		
 	</ul>
 </div>
 <div id="logout">
-	<a href="../scripts/logout.php">Sair</a>
+	<a href="../scripts/login.php?acao=logout">Sair</a>
 </div>
 <br>
 <center>Chat Local com Socket.io</center>
@@ -61,7 +61,7 @@ if (!$_SESSION["id_usuario"] || !$_SESSION["login"] || !$_SESSION["senha"]) {
 $(function(){
 	const origin = location.origin;
 	const port = '3000';
-	const room = '<?=$_SESSION["sala"]?>';
+	const room = '<?=$_SESSION["id_sala"]?>';
 	//const room = Math.floor( (Math.random() * 2) + 1) ;
 
 	const socket = io(origin +':'+ port, {
@@ -123,10 +123,10 @@ $(function(){
 	});
 
 	socket.on('notification', function(notifications){
-		$.each(notifications, function(i, row){
-			console.log(i);
-			console.log(row);
-		})
+		//$.each(notifications, function(i, row){
+			console.log(notifications);
+			$("#notificacoes").html("<li>"+ notifications +"</li>");
+		//})
 	});
 
 

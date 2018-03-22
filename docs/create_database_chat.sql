@@ -28,3 +28,16 @@ CREATE TABLE mensagens (
 	FOREIGN KEY (id_sala) REFERENCES salas (id_sala) ON UPDATE CASCADE ON DELETE NO ACTION,
 	FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON UPDATE CASCADE ON DELETE NO ACTION
 );
+
+CREATE TABLE usuarios_online (
+	id_usuario INT NOT NULL,
+	id_sala INT NOT NULL,
+	data_entrada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	data_saida DATETIME NULL DEFAULT NULL,
+	FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (id_sala) REFERENCES salas (id_sala) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+INSERT INTO usuarios (id_usuario, nome, login, senha, habilitado) VALUES (1, 'Hercolys', 'hercolys', MD5('1234'), 1);
+INSERT INTO salas (id_sala, nome) VALUES (1, 'Sala 1');
+INSERT INTO salas (id_sala, nome) VALUES (2, 'Sala 2');

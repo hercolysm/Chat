@@ -135,7 +135,7 @@ redis_cli.on('subscribe', (channel, count) => {
 
 redis_cli.on('message', function(channel, message){
 	console.log('new message received! sending to clients');
-	io.to(channel).emit('notificacoes', message);
+	io.to(channel).emit('notification', message);
 });
 
 /*
